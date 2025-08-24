@@ -49,13 +49,19 @@ npm run dev
 
 ## 📖 사용 방법
 
-1. **GitHub 커밋 URL 입력**: 분석하고 싶은 공개 GitHub 커밋의 URL을 입력합니다
+### 1단계: 레포지토리 탐색
 
-   - 예시: `https://github.com/owner/repo/commit/sha`
+1. **GitHub 레포지토리 URL 입력**: 분석하고 싶은 공개 GitHub 레포지토리의 URL을 입력합니다
 
-2. **분석 시작**: "분석 시작" 버튼을 클릭합니다
+   - 예시: `https://github.com/lux-02/qshing_pj`
 
-3. **결과 확인**:
+2. **커밋 리스트 확인**: "커밋 보기" 버튼을 클릭하면 최근 30개의 커밋 리스트가 표시됩니다
+
+### 2단계: 개별 커밋 분석
+
+3. **커밋 선택**: 리스트에서 분석하고 싶은 커밋을 클릭합니다
+
+4. **AI 분석 결과 확인**:
    - 커밋 정보 (작성자, 날짜, 메시지 등)
    - 파일별 diff 시각화
    - AI 기반 변경사항 분석 결과
@@ -157,7 +163,11 @@ GitHub 커밋 정보를 가져옵니다.
 
 ## 🌐 예시 URL
 
-테스트를 위한 예시 GitHub 커밋 URL:
+테스트를 위한 예시 GitHub 레포지토리 URL:
+
+- `https://github.com/lux-02/qshing_pj`
+
+특정 커밋 분석 예시:
 
 - `https://github.com/lux-02/qshing_pj/commit/ff81a4956f423aee82d6f15a34e59efad55de59c`
 

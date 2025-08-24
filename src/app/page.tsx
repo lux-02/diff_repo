@@ -2,69 +2,51 @@
 
 import React, { useState } from "react";
 import { Search, Loader, AlertCircle, GitBranch } from "lucide-react";
-import CommitInfo from "@/components/CommitInfo";
-import DiffViewer from "@/components/DiffViewer";
-import AnalysisPanel from "@/components/AnalysisPanel";
+import { useRouter } from "next/navigation";
+import CommitsList from "@/components/CommitsList";
 
 export default function Home() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [commitData, setCommitData] = useState(null);
-  const [analyses, setAnalyses] = useState([]);
-  const [analyzing, setAnalyzing] = useState(false);
+  const [repoData, setRepoData] = useState(null);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!url.trim()) {
-      setError("GitHub 커밋 URL을 입력해주세요.");
+      setError("GitHub 레포지토리 URL을 입력해주세요.");
       return;
     }
 
     setLoading(true);
     setError("");
-    setCommitData(null);
-    setAnalyses([]);
+    setRepoData(null);
 
     try {
-      // GitHub 커밋 데이터 가져오기
+      // GitHub 레포지토리 커밋 리스트 가져오기
       const response = await fetch(
-        `/api/github/commit?url=${encodeURIComponent(url)}`
+        `/api/github/commits?repo=${encodeURIComponent(url)}&per_page=30`
       );
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch commit data");
+        throw new Error(data.error || "Failed to fetch repository data");
       }
 
-      setCommitData(data);
-
-      // AI 분석 시작
-      setAnalyzing(true);
-      const analysisResponse = await fetch("/api/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          files: data.files,
-          commitMessage: data.commit.message,
-        }),
-      });
-
-      const analysisData = await analysisResponse.json();
-
-      if (!analysisResponse.ok) {
-        throw new Error(analysisData.error || "Failed to analyze changes");
-      }
-
-      setAnalyses(analysisData.analyses);
+      setRepoData(data);
     } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
-      setAnalyzing(false);
     }
+  };
+
+  const handleCommitClick = (commit: any) => {
+    // 커밋 상세 페이지로 이동
+    const owner = repoData?.repository.owner;
+    const repo = repoData?.repository.repo;
+    router.push(`/commit/${owner}/${repo}/${commit.sha}`);
   };
 
   return (
@@ -79,7 +61,7 @@ export default function Home() {
                 GitHub Diff Analyzer
               </h1>
               <p className="text-sm text-gray-600">
-                AI 기반 커밋 변경사항 분석 도구
+                AI 기반 레포지토리 커밋 분석 도구
               </p>
             </div>
           </div>
@@ -95,7 +77,7 @@ export default function Home() {
                 htmlFor="url"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                GitHub 커밋 URL
+                GitHub 레포지토리 URL
               </label>
               <div className="flex space-x-3">
                 <input
@@ -103,7 +85,7 @@ export default function Home() {
                   id="url"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://github.com/owner/repo/commit/sha"
+                  placeholder="https://github.com/owner/repo"
                   className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   disabled={loading}
                 />
@@ -117,14 +99,13 @@ export default function Home() {
                   ) : (
                     <Search className="w-5 h-5" />
                   )}
-                  <span>{loading ? "분석 중..." : "분석 시작"}</span>
+                  <span>{loading ? "로딩 중..." : "커밋 보기"}</span>
                 </button>
               </div>
             </div>
 
             <p className="text-sm text-gray-500">
-              예시:
-              https://github.com/lux-02/qshing_pj/commit/ff81a4956f423aee82d6f15a34e59efad55de59c
+              예시: https://github.com/lux-02/qshing_pj
             </p>
           </form>
 
@@ -136,64 +117,28 @@ export default function Home() {
           )}
         </div>
 
-        {/* 결과 영역 */}
-        {commitData && (
-          <div className="space-y-8">
-            {/* 커밋 정보 */}
-            <CommitInfo commitData={commitData} />
-
-            {/* 파일별 변경사항 및 분석 */}
-            {commitData.files.map((file: any, index: number) => (
-              <div key={index} className="grid lg:grid-cols-2 gap-6">
-                {/* Diff 뷰어 */}
-                <div>
-                  <DiffViewer
-                    filename={file.filename}
-                    patch={file.patch}
-                    status={file.status}
-                    additions={file.additions}
-                    deletions={file.deletions}
-                  />
-                </div>
-
-                {/* AI 분석 결과 */}
-                <div>
-                  {analyzing ? (
-                    <div className="bg-white border border-gray-200 rounded-lg p-8 flex items-center justify-center">
-                      <div className="text-center">
-                        <Loader className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
-                        <p className="text-gray-600">
-                          AI가 코드를 분석 중입니다...
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    analyses.find(
-                      (analysis: any) => analysis.filename === file.filename
-                    ) && (
-                      <AnalysisPanel
-                        analysis={analyses.find(
-                          (analysis: any) => analysis.filename === file.filename
-                        )}
-                      />
-                    )
-                  )}
-                </div>
-              </div>
-            ))}
+        {/* 커밋 리스트 */}
+        {repoData && (
+          <div className="space-y-6">
+            <CommitsList
+              repository={repoData.repository}
+              commits={repoData.commits}
+              onCommitClick={handleCommitClick}
+              loading={loading}
+            />
           </div>
         )}
 
         {/* 빈 상태 */}
-        {!commitData && !loading && (
+        {!repoData && !loading && (
           <div className="text-center py-16">
             <GitBranch className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-medium text-gray-900 mb-2">
-              GitHub 커밋을 분석해보세요
+              GitHub 레포지토리를 분석해보세요
             </h3>
             <p className="text-gray-600 max-w-lg mx-auto">
-              GitHub 커밋 URL을 입력하면 AI가 변경사항을 자동으로 분석하고
-              시각적으로 표시해드립니다.
+              GitHub 레포지토리 URL을 입력하면 커밋 히스토리를 확인하고 개별
+              커밋을 AI로 분석할 수 있습니다.
             </p>
           </div>
         )}

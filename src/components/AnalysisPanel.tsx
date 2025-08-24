@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   Brain,
   AlertTriangle,
@@ -116,10 +118,70 @@ export default function AnalysisPanel({ analysis }: AnalysisPanelProps) {
         {/* 상세 분석 */}
         <div>
           <h4 className="font-medium text-gray-900 mb-2">상세 분석</h4>
-          <div className="bg-gray-50 p-4 rounded border">
-            <div className="whitespace-pre-wrap text-gray-700 text-sm leading-relaxed">
+          <div className="bg-gray-50 p-4 rounded border prose prose-sm prose-gray max-w-none">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                h1: ({ children }) => (
+                  <h1 className="text-lg font-bold text-gray-900 mb-3 mt-4 first:mt-0">
+                    {children}
+                  </h1>
+                ),
+                h2: ({ children }) => (
+                  <h2 className="text-base font-semibold text-gray-800 mb-2 mt-4 first:mt-0">
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-sm font-semibold text-gray-700 mb-2 mt-3 first:mt-0">
+                    {children}
+                  </h3>
+                ),
+                p: ({ children }) => (
+                  <p className="text-gray-700 mb-3 leading-relaxed">
+                    {children}
+                  </p>
+                ),
+                ul: ({ children }) => (
+                  <ul className="list-disc pl-6 mb-3 space-y-1 text-gray-700">
+                    {children}
+                  </ul>
+                ),
+                ol: ({ children }) => (
+                  <ol className="list-decimal pl-6 mb-3 space-y-1 text-gray-700">
+                    {children}
+                  </ol>
+                ),
+                li: ({ children }) => (
+                  <li className="text-gray-700 leading-relaxed">{children}</li>
+                ),
+                strong: ({ children }) => (
+                  <strong className="font-semibold text-gray-900">
+                    {children}
+                  </strong>
+                ),
+                em: ({ children }) => (
+                  <em className="italic text-gray-700">{children}</em>
+                ),
+                code: ({ children }) => (
+                  <code className="bg-gray-200 px-1 py-0.5 rounded text-xs font-mono text-gray-800">
+                    {children}
+                  </code>
+                ),
+                pre: ({ children }) => (
+                  <pre className="bg-gray-800 text-gray-100 p-3 rounded-md overflow-x-auto text-xs">
+                    {children}
+                  </pre>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-4 border-blue-500 pl-4 py-1 mb-3 bg-blue-50 text-gray-700">
+                    {children}
+                  </blockquote>
+                ),
+              }}
+            >
               {analysis.analysis}
-            </div>
+            </ReactMarkdown>
           </div>
         </div>
 
