@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Search, Loader, AlertCircle, GitBranch } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CommitsList from "@/components/CommitsList";
+import { RepositoryData, ProcessedCommit } from "@/types/github";
 
-export default function Home() {
+function HomeContent() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [repoData, setRepoData] = useState<any>(null);
+  const [repoData, setRepoData] = useState<RepositoryData | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -33,15 +34,15 @@ export default function Home() {
       const response = await fetch(
         `/api/github/commits?repo=${encodeURIComponent(repoUrl)}&per_page=30`
       );
-      const data = await response.json();
+      const data: RepositoryData = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch repository data");
+        throw new Error("Failed to fetch repository data");
       }
 
       setRepoData(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error occurred");
     } finally {
       setLoading(false);
     }
@@ -57,7 +58,7 @@ export default function Home() {
     await loadRepository(url);
   };
 
-  const handleCommitClick = (commit: any) => {
+  const handleCommitClick = (commit: ProcessedCommit) => {
     // 커밋 상세 페이지로 이동
     const owner = repoData?.repository.owner;
     const repo = repoData?.repository.repo;
@@ -167,5 +168,13 @@ export default function Home() {
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }

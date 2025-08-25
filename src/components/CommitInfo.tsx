@@ -8,35 +8,7 @@ import {
   ExternalLink,
   BarChart3,
 } from "lucide-react";
-
-interface CommitData {
-  commit: {
-    sha: string;
-    url: string;
-    message: string;
-    author: {
-      name: string;
-      email: string;
-      date: string;
-    };
-    committer: {
-      name: string;
-      email: string;
-      date: string;
-    };
-  };
-  repository: {
-    owner: string;
-    repo: string;
-    full_name: string;
-  };
-  stats: {
-    total: number;
-    additions: number;
-    deletions: number;
-  };
-  files: any[];
-}
+import { CommitData } from "@/types/github";
 
 interface CommitInfoProps {
   commitData: CommitData;

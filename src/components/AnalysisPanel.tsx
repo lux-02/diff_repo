@@ -10,21 +10,7 @@ import {
   Info,
   TrendingUp,
 } from "lucide-react";
-
-interface Analysis {
-  filename: string;
-  status: string;
-  additions: number;
-  deletions: number;
-  analysis: string;
-  summary: string;
-  impact: "high" | "medium" | "low" | "unknown";
-  changes: Array<{
-    type: string;
-    line: string;
-    lineNumber?: number;
-  }>;
-}
+import { Analysis } from "@/types/github";
 
 interface AnalysisPanelProps {
   analysis: Analysis;
@@ -104,13 +90,13 @@ export default function AnalysisPanel({ analysis }: AnalysisPanelProps) {
               추가된 라인
             </div>
             <div className="text-2xl font-bold text-green-700">
-              +{analysis.additions}
+              +{analysis.additions || 0}
             </div>
           </div>
           <div className="bg-red-50 p-3 rounded border border-red-200">
             <div className="text-sm text-red-600 font-medium">삭제된 라인</div>
             <div className="text-2xl font-bold text-red-700">
-              -{analysis.deletions}
+              -{analysis.deletions || 0}
             </div>
           </div>
         </div>

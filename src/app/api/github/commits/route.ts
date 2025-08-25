@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { GitHubCommit, ProcessedCommit } from "@/types/github";
 
 export async function GET(request: NextRequest) {
   try {
@@ -48,33 +49,35 @@ export async function GET(request: NextRequest) {
       throw new Error(`GitHub API error: ${commitsResponse.status}`);
     }
 
-    const commitsData = await commitsResponse.json();
+    const commitsData: GitHubCommit[] = await commitsResponse.json();
 
     // 커밋 정보 정리
-    const processedCommits = commitsData.map((commit: any) => ({
-      sha: commit.sha,
-      shortSha: commit.sha.substring(0, 7),
-      message: commit.commit.message,
-      author: {
-        name: commit.commit.author.name,
-        email: commit.commit.author.email,
-        date: commit.commit.author.date,
-        avatar: commit.author?.avatar_url || null,
-        username: commit.author?.login || null,
-      },
-      committer: {
-        name: commit.commit.committer.name,
-        email: commit.commit.committer.email,
-        date: commit.commit.committer.date,
-      },
-      url: commit.html_url,
-      stats: {
-        total: commit.stats?.total || 0,
-        additions: commit.stats?.additions || 0,
-        deletions: commit.stats?.deletions || 0,
-      },
-      files: commit.files?.length || 0,
-    }));
+    const processedCommits: ProcessedCommit[] = commitsData.map(
+      (commit: GitHubCommit) => ({
+        sha: commit.sha,
+        shortSha: commit.sha.substring(0, 7),
+        message: commit.commit.message,
+        author: {
+          name: commit.commit.author.name,
+          email: commit.commit.author.email,
+          date: commit.commit.author.date,
+          avatar: commit.author?.avatar_url ?? null,
+          username: commit.author?.login ?? null,
+        },
+        committer: {
+          name: commit.commit.committer.name,
+          email: commit.commit.committer.email,
+          date: commit.commit.committer.date,
+        },
+        url: commit.html_url,
+        stats: {
+          total: commit.stats?.total || 0,
+          additions: commit.stats?.additions || 0,
+          deletions: commit.stats?.deletions || 0,
+        },
+        files: commit.files?.length || 0,
+      })
+    );
 
     const result = {
       repository: {

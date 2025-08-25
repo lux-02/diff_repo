@@ -1,17 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  ArrowLeft,
-  Loader,
-  AlertCircle,
-  GitCommit,
-  ExternalLink,
-} from "lucide-react";
+import { ArrowLeft, Loader, AlertCircle, GitCommit } from "lucide-react";
 import CommitInfo from "@/components/CommitInfo";
 import DiffViewer from "@/components/DiffViewer";
 import AnalysisPanel from "@/components/AnalysisPanel";
+import { CommitData, Analysis, GitHubFile } from "@/types/github";
 
 export default function CommitDetailPage() {
   const params = useParams();
@@ -19,23 +14,14 @@ export default function CommitDetailPage() {
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState("");
-  const [commitData, setCommitData] = useState<any>(null);
-  const [analyses, setAnalyses] = useState<any[]>([]);
+  const [commitData, setCommitData] = useState<CommitData | null>(null);
+  const [analyses, setAnalyses] = useState<Analysis[]>([]);
 
   // URL 파라미터에서 owner, repo, sha 추출
   const paramsArray = Array.isArray(params.params) ? params.params : [];
   const [owner, repo, sha] = paramsArray;
 
-  useEffect(() => {
-    if (owner && repo && sha) {
-      fetchCommitData();
-    } else {
-      setError("잘못된 URL 형식입니다.");
-      setLoading(false);
-    }
-  }, [owner, repo, sha]);
-
-  const fetchCommitData = async () => {
+  const fetchCommitData = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -46,10 +32,10 @@ export default function CommitDetailPage() {
       const response = await fetch(
         `/api/github/commit?url=${encodeURIComponent(commitUrl)}`
       );
-      const data = await response.json();
+      const data: CommitData = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch commit data");
+        throw new Error("Failed to fetch commit data");
       }
 
       setCommitData(data);
@@ -68,21 +54,31 @@ export default function CommitDetailPage() {
           }),
         });
 
-        const analysisData = await analysisResponse.json();
+        const analysisData: { analyses: Analysis[] } =
+          await analysisResponse.json();
 
         if (analysisResponse.ok) {
           setAnalyses(analysisData.analyses);
         } else {
-          console.error("Analysis failed:", analysisData.error);
+          console.error("Analysis failed");
         }
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error occurred");
     } finally {
       setLoading(false);
       setAnalyzing(false);
     }
-  };
+  }, [owner, repo, sha]);
+
+  useEffect(() => {
+    if (owner && repo && sha) {
+      fetchCommitData();
+    } else {
+      setError("잘못된 URL 형식입니다.");
+      setLoading(false);
+    }
+  }, [owner, repo, sha, fetchCommitData]);
 
   const handleGoBack = () => {
     // 커밋 히스토리 페이지로 이동하면서 레포지토리 URL을 쿼리 파라미터로 전달
@@ -112,7 +108,7 @@ export default function CommitDetailPage() {
             <div className="text-center">
               <p className="text-gray-600">
                 <a href="mailto:darkwinterlab@gmail.com">
-                  darkwinterlab@gmail.com
+                  Copyright © darkwinterlab@gmail.com
                 </a>
               </p>
             </div>
@@ -196,13 +192,13 @@ export default function CommitDetailPage() {
             <CommitInfo commitData={commitData} />
 
             {/* 파일별 변경사항 및 분석 */}
-            {commitData.files.map((file: any, index: number) => (
+            {commitData.files.map((file: GitHubFile, index: number) => (
               <div key={index} className="grid lg:grid-cols-1 gap-6">
                 {/* Diff 뷰어 */}
                 <div>
                   <DiffViewer
                     filename={file.filename}
-                    patch={file.patch}
+                    patch={file.patch || ""}
                     status={file.status}
                     additions={file.additions}
                     deletions={file.deletions}
@@ -223,7 +219,8 @@ export default function CommitDetailPage() {
                   ) : (
                     (() => {
                       const analysis = analyses.find(
-                        (analysis: any) => analysis.filename === file.filename
+                        (analysis: Analysis) =>
+                          analysis.filename === file.filename
                       );
                       return analysis ? (
                         <AnalysisPanel analysis={analysis} />
@@ -243,7 +240,7 @@ export default function CommitDetailPage() {
           <div className="text-center">
             <p className="text-gray-600">
               <a href="mailto:darkwinterlab@gmail.com">
-                darkwinterlab@gmail.com
+                Copyright © darkwinterlab@gmail.com
               </a>
             </p>
           </div>

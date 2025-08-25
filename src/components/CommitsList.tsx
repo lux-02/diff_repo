@@ -2,31 +2,8 @@
 
 import React from "react";
 import { Calendar, GitCommit, User, FileText, Plus, Minus } from "lucide-react";
-
-interface Commit {
-  sha: string;
-  shortSha: string;
-  message: string;
-  author: {
-    name: string;
-    email: string;
-    date: string;
-    avatar: string | null;
-    username: string | null;
-  };
-  committer: {
-    name: string;
-    email: string;
-    date: string;
-  };
-  url: string;
-  stats: {
-    total: number;
-    additions: number;
-    deletions: number;
-  };
-  files: number;
-}
+import Image from "next/image";
+import { ProcessedCommit } from "@/types/github";
 
 interface Repository {
   owner: string;
@@ -37,8 +14,8 @@ interface Repository {
 
 interface CommitsListProps {
   repository: Repository;
-  commits: Commit[];
-  onCommitClick: (commit: Commit) => void;
+  commits: ProcessedCommit[];
+  onCommitClick: (commit: ProcessedCommit) => void;
   loading?: boolean;
 }
 
@@ -118,9 +95,11 @@ export default function CommitsList({
               {/* 아바타 */}
               <div className="flex-shrink-0">
                 {commit.author.avatar ? (
-                  <img
+                  <Image
                     src={commit.author.avatar}
                     alt={commit.author.name}
+                    width={40}
+                    height={40}
                     className="w-10 h-10 rounded-full"
                   />
                 ) : (

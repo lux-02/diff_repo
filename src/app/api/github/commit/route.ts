@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { GitHubCommit, GitHubFile } from "@/types/github";
 
 export async function GET(request: NextRequest) {
   try {
@@ -46,11 +47,11 @@ export async function GET(request: NextRequest) {
       throw new Error(`GitHub API error: ${commitResponse.status}`);
     }
 
-    const commitData = await commitResponse.json();
+    const commitData: GitHubCommit = await commitResponse.json();
 
     // 파일별 diff 정보 가져오기
     const files = commitData.files || [];
-    const processedFiles = files.map((file: any) => ({
+    const processedFiles = files.map((file: GitHubFile) => ({
       filename: file.filename,
       status: file.status, // added, modified, removed, renamed
       additions: file.additions,

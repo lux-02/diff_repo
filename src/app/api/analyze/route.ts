@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GitHubFile, Analysis, AnalysisChange } from "@/types/github";
 
 const genAI = new GoogleGenerativeAI(
   process.env.GOOGLE_GEMINI_API_KEY || "AIzaSyArEaQ4G7svUp-Uy9vN080y6bKlrrlN7yU"
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
     const analyses = await Promise.all(
-      files.map(async (file: any) => {
+      files.map(async (file: GitHubFile): Promise<Analysis> => {
         try {
           if (!file.patch) {
             return {
@@ -97,9 +98,7 @@ ${file.patch}
   }
 }
 
-function extractChanges(
-  patch: string
-): Array<{ type: string; line: string; lineNumber?: number }> {
+function extractChanges(patch: string): AnalysisChange[] {
   const lines = patch.split("\n");
   const changes = [];
 
