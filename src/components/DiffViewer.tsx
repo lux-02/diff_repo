@@ -67,8 +67,10 @@ export default function DiffViewer({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             {getStatusIcon()}
-            <span className="font-mono text-sm font-medium">{filename}</span>
-            <span className="text-xs px-2 py-1 bg-gray-100 rounded-full capitalize">
+            <span className="font-mono text-sm font-medium text-gray-800">
+              {filename}
+            </span>
+            <span className="text-xs px-2 py-1 bg-gray-100  text-gray-800 rounded-full capitalize">
               {status}
             </span>
           </div>

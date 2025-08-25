@@ -112,7 +112,7 @@ export default function CommitInfo({ commitData }: CommitInfoProps) {
         {/* SHA */}
         <div>
           <h3 className="font-medium text-gray-900 mb-2">커밋 SHA</h3>
-          <code className="bg-gray-100 px-3 py-2 rounded font-mono text-sm">
+          <code className="bg-gray-100 text-gray-800 px-3 py-2 rounded font-mono text-sm">
             {commitData.commit.sha}
           </code>
         </div>
@@ -127,19 +127,19 @@ export default function CommitInfo({ commitData }: CommitInfoProps) {
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">이름:</span>
-                <span className="text-sm font-medium">
+                <span className="text-sm font-medium text-gray-800">
                   {commitData.commit.author.name}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">이메일:</span>
-                <span className="text-sm">
+                <span className="text-sm text-gray-800">
                   {commitData.commit.author.email}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4 text-gray-400" />
-                <span className="text-sm">
+                <span className="text-sm text-gray-800">
                   {formatDate(commitData.commit.author.date)}
                 </span>
               </div>
@@ -154,19 +154,19 @@ export default function CommitInfo({ commitData }: CommitInfoProps) {
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">이름:</span>
-                <span className="text-sm font-medium">
+                <span className="text-sm font-medium text-gray-800">
                   {commitData.commit.committer.name}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">이메일:</span>
-                <span className="text-sm">
+                <span className="text-sm text-gray-800">
                   {commitData.commit.committer.email}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4 text-gray-400" />
-                <span className="text-sm">
+                <span className="text-sm text-gray-800">
                   {formatDate(commitData.commit.committer.date)}
                 </span>
               </div>

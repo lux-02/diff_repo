@@ -19,8 +19,8 @@ export default function CommitDetailPage() {
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState("");
-  const [commitData, setCommitData] = useState(null);
-  const [analyses, setAnalyses] = useState([]);
+  const [commitData, setCommitData] = useState<any>(null);
+  const [analyses, setAnalyses] = useState<any[]>([]);
 
   // URL 파라미터에서 owner, repo, sha 추출
   const paramsArray = Array.isArray(params.params) ? params.params : [];
@@ -85,13 +85,19 @@ export default function CommitDetailPage() {
   };
 
   const handleGoBack = () => {
-    router.back();
+    // 커밋 히스토리 페이지로 이동하면서 레포지토리 URL을 쿼리 파라미터로 전달
+    if (owner && repo) {
+      const repoUrl = `https://github.com/${owner}/${repo}`;
+      router.push(`/?repo=${encodeURIComponent(repoUrl)}`);
+    } else {
+      router.back();
+    }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="page-container bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="main-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center min-h-96">
             <div className="text-center">
               <Loader className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
@@ -99,14 +105,27 @@ export default function CommitDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* 푸터 */}
+        <footer className="footer bg-white border-t">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="text-center">
+              <p className="text-gray-600">
+                <a href="mailto:darkwinterlab@gmail.com">
+                  darkwinterlab@gmail.com
+                </a>
+              </p>
+            </div>
+          </div>
+        </footer>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="page-container bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="main-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center min-h-96">
             <div className="text-center">
               <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
@@ -123,54 +142,54 @@ export default function CommitDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* 푸터 */}
+        <footer className="footer bg-white border-t">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="text-center">
+              <p className="text-gray-600">
+                <a href="mailto:darkwinterlab@gmail.com">
+                  darkwinterlab@gmail.com
+                </a>
+              </p>
+            </div>
+          </div>
+        </footer>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="page-container bg-gradient-to-br from-slate-50 to-blue-50">
       {/* 헤더 */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={handleGoBack}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                <span>뒤로</span>
-              </button>
-              <div className="flex items-center space-x-3">
-                <GitCommit className="w-6 h-6 text-blue-600" />
-                <div>
-                  <h1 className="text-xl font-bold text-gray-900">
-                    커밋 상세 분석
-                  </h1>
-                  {commitData && (
-                    <p className="text-sm text-gray-600">
-                      {commitData.repository.full_name} • {sha?.substring(0, 7)}
-                    </p>
-                  )}
-                </div>
+            <button
+              onClick={handleGoBack}
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span>뒤로</span>
+            </button>
+            <div className="flex items-center space-x-3">
+              <GitCommit className="w-6 h-6 text-blue-600" />
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">
+                  커밋 상세 분석
+                </h1>
+                {commitData && (
+                  <p className="text-sm text-gray-600">
+                    {commitData.repository.full_name} • {sha?.substring(0, 7)}
+                  </p>
+                )}
               </div>
             </div>
-            {commitData && (
-              <a
-                href={commitData.commit.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-1 text-blue-600 hover:text-blue-800 transition-colors"
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span className="text-sm">GitHub에서 보기</span>
-              </a>
-            )}
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="main-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {commitData && (
           <div className="space-y-8">
             {/* 커밋 정보 */}
@@ -178,7 +197,7 @@ export default function CommitDetailPage() {
 
             {/* 파일별 변경사항 및 분석 */}
             {commitData.files.map((file: any, index: number) => (
-              <div key={index} className="grid lg:grid-cols-2 gap-6">
+              <div key={index} className="grid lg:grid-cols-1 gap-6">
                 {/* Diff 뷰어 */}
                 <div>
                   <DiffViewer
@@ -202,15 +221,14 @@ export default function CommitDetailPage() {
                       </div>
                     </div>
                   ) : (
-                    analyses.find(
-                      (analysis: any) => analysis.filename === file.filename
-                    ) && (
-                      <AnalysisPanel
-                        analysis={analyses.find(
-                          (analysis: any) => analysis.filename === file.filename
-                        )}
-                      />
-                    )
+                    (() => {
+                      const analysis = analyses.find(
+                        (analysis: any) => analysis.filename === file.filename
+                      );
+                      return analysis ? (
+                        <AnalysisPanel analysis={analysis} />
+                      ) : null;
+                    })()
                   )}
                 </div>
               </div>
@@ -218,6 +236,19 @@ export default function CommitDetailPage() {
           </div>
         )}
       </main>
+
+      {/* 푸터 */}
+      <footer className="footer bg-white border-t">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <p className="text-gray-600">
+              <a href="mailto:darkwinterlab@gmail.com">
+                darkwinterlab@gmail.com
+              </a>
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

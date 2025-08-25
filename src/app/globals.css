@@ -160,7 +160,8 @@ body {
   line-height: 1.6;
 }
 
-.prose ul, .prose ol {
+.prose ul,
+.prose ol {
   margin-bottom: 0.75rem;
   padding-left: 1.25rem;
 }
@@ -177,14 +178,6 @@ body {
 
 .prose em {
   font-style: italic;
-}
-
-.prose code {
-  background-color: #f3f4f6;
-  padding: 0.125rem 0.25rem;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 .prose pre {
@@ -209,4 +202,24 @@ body {
 /* 첫 번째 요소의 상단 마진 제거 */
 .prose > *:first-child {
   margin-top: 0 !important;
+}
+
+/* Sticky Footer 스타일 */
+html,
+body {
+  height: 100%;
+}
+
+.page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+}
+
+.footer {
+  flex-shrink: 0;
 }

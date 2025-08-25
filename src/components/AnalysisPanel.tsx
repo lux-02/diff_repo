@@ -93,7 +93,7 @@ export default function AnalysisPanel({ analysis }: AnalysisPanelProps) {
         <div className={`p-3 rounded border ${getImpactColor()}`}>
           <div className="flex items-center space-x-2 mb-2">
             {getImpactIcon()}
-            <span className="font-medium">{getImpactText()}</span>
+            <span className="font-medium text-gray-800">{getImpactText()}</span>
           </div>
         </div>
 
@@ -164,12 +164,12 @@ export default function AnalysisPanel({ analysis }: AnalysisPanelProps) {
                   <em className="italic text-gray-700">{children}</em>
                 ),
                 code: ({ children }) => (
-                  <code className="bg-gray-200 px-1 py-0.5 rounded text-xs font-mono text-gray-800">
+                  <code className=" bg-gray-200 px-1 py-0.5 rounded text-xs font-mono text-gray-800">
                     {children}
                   </code>
                 ),
                 pre: ({ children }) => (
-                  <pre className="bg-gray-800 text-gray-100 p-3 rounded-md overflow-x-auto text-xs">
+                  <pre className="bg-gray-800 text-gray-800 p-3 rounded-md overflow-x-auto text-xs">
                     {children}
                   </pre>
                 ),

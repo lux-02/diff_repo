@@ -171,7 +171,7 @@ export default function CommitsList({
                         )}
                       </div>
                     )}
-                    <code className="text-xs bg-gray-100 px-2 py-1 rounded font-mono">
+                    <code className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded font-mono">
                       {commit.shortSha}
                     </code>
                   </div>

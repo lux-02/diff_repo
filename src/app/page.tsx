@@ -1,24 +1,29 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Search, Loader, AlertCircle, GitBranch } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import CommitsList from "@/components/CommitsList";
 
 export default function Home() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [repoData, setRepoData] = useState(null);
+  const [repoData, setRepoData] = useState<any>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!url.trim()) {
-      setError("GitHub 레포지토리 URL을 입력해주세요.");
-      return;
+  // URL 쿼리 파라미터에서 repo 값을 확인하여 자동 로드
+  useEffect(() => {
+    const repoParam = searchParams.get("repo");
+    if (repoParam) {
+      setUrl(repoParam);
+      // 자동으로 레포지토리 로드
+      loadRepository(repoParam);
     }
+  }, [searchParams]);
 
+  const loadRepository = async (repoUrl: string) => {
     setLoading(true);
     setError("");
     setRepoData(null);
@@ -26,7 +31,7 @@ export default function Home() {
     try {
       // GitHub 레포지토리 커밋 리스트 가져오기
       const response = await fetch(
-        `/api/github/commits?repo=${encodeURIComponent(url)}&per_page=30`
+        `/api/github/commits?repo=${encodeURIComponent(repoUrl)}&per_page=30`
       );
       const data = await response.json();
 
@@ -42,6 +47,16 @@ export default function Home() {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!url.trim()) {
+      setError("GitHub 레포지토리 URL을 입력해주세요.");
+      return;
+    }
+
+    await loadRepository(url);
+  };
+
   const handleCommitClick = (commit: any) => {
     // 커밋 상세 페이지로 이동
     const owner = repoData?.repository.owner;
@@ -50,7 +65,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="page-container bg-gradient-to-br from-slate-50 to-blue-50">
       {/* 헤더 */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -68,7 +83,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="main-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 입력 폼 */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -79,7 +94,7 @@ export default function Home() {
               >
                 GitHub 레포지토리 URL
               </label>
-              <div className="flex space-x-3">
+              <div className="flex space-x-3 text-gray-800">
                 <input
                   type="url"
                   id="url"
@@ -99,14 +114,9 @@ export default function Home() {
                   ) : (
                     <Search className="w-5 h-5" />
                   )}
-                  <span>{loading ? "로딩 중..." : "커밋 보기"}</span>
                 </button>
               </div>
             </div>
-
-            <p className="text-sm text-gray-500">
-              예시: https://github.com/lux-02/qshing_pj
-            </p>
           </form>
 
           {error && (
@@ -145,11 +155,13 @@ export default function Home() {
       </main>
 
       {/* 푸터 */}
-      <footer className="bg-white border-t mt-16">
+      <footer className="footer bg-white border-t">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <p className="text-gray-600">
-              Powered by Google Gemini AI & GitHub API
+              <a href="mailto:darkwinterlab@gmail.com">
+                Copyright © darkwinterlab@gmail.com
+              </a>
             </p>
           </div>
         </div>
